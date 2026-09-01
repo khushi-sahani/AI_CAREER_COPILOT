@@ -1,4 +1,7 @@
+import email
+
 from flask import Flask, render_template, request, redirect, session
+from werkzeug.security import generate_password_hash, check_password_hash
 from db import Base, engine, SessionLocal
 from ai import analyze_resume
 
@@ -30,6 +33,7 @@ def home():
     return redirect("/login")
 
 
+
 # =========================
 # SIGNUP
 # =========================
@@ -56,9 +60,11 @@ def signup():
                 return "User already exists. Please log in."
 
             # Create new user
+            hashed_password = generate_password_hash(password)
+
             new_user = models.User(
                 email=email,
-                password=password
+                password=hashed_password
             )
 
             db.add(new_user)
@@ -87,19 +93,16 @@ def login():
             email = request.form["email"]
             password = request.form["password"]
 
-            # Find user
+            # Find user by email
             user = (
                 db.query(models.User)
-                .filter_by(
-                    email=email,
-                    password=password
-                )
+                .filter_by(email=email)
                 .first()
             )
 
-            if user:
+            # Check password
+            if user and check_password_hash(user.password, password):
 
-                # Save user information in session
                 session["user_id"] = user.id
                 session["user_email"] = user.email
 
@@ -111,6 +114,8 @@ def login():
 
     finally:
         db.close()
+
+
 
 
 # =========================
@@ -314,7 +319,7 @@ def history():
 
             try:
 
-                parsed_result = json.loads(report.results)
+                parsed_result = json.loads(report.result)
 
             except Exception:
 

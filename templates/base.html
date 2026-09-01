@@ -3,31 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Career Copilot</title>
-    <link rel="stylesheet" 
-    href="{{ url_for('static', filename='style.css') }}">
 
+    <title>{% block title %}AI Career Copilot{% endblock %}</title>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Main CSS -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
-    <header>
-        <div class= "container">
-            <nav>
-            
-                    <nav>
-                        <a href="{{ url_for('history') }}">History</a>
-                        <a href="{{ url_for('dashboard') }}">Dashboard</a>
-                        <a href="{{ url_for('logout') }}">Logout</a>
-                    </nav>
+
+    <!-- Navigation -->
+    <header class="navbar">
+        <div class="container navbar-container">
+
+            <a href="{{ url_for('dashboard') }}" class="brand">
+                <span class="brand-icon">✦</span>
+                <span>AI Career Copilot</span>
+            </a>
+
+            <nav class="nav-links">
+                <a href="{{ url_for('dashboard') }}" class="nav-link">
+                    Dashboard
+                </a>
+
+                <a href="{{ url_for('history') }}" class="nav-link">
+                    History
+                </a>
+
+                <a href="{{ url_for('logout') }}" class="nav-link logout-link">
+                    Logout
+                </a>
             </nav>
+
         </div>
-        
     </header>
-    <main class="container">
+
+    <!-- Main Content -->
+    <main class="container main-content">
+
         {% block content %}
         {% endblock %}
+
     </main>
-    <footer>
-        <p> 2026 AI Career Copilot. All rights reserved.</p>
-        </footer>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>© 2026 AI Career Copilot. All rights reserved.</p>
+        </div>
+    </footer>
+
 </body>
 </html>
+

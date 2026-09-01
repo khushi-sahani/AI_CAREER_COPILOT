@@ -1,96 +1,225 @@
 {% extends "base.html" %}
 
+{% block title %}Dashboard - AI Career Copilot{% endblock %}
+
 {% block content %}
 
-<h2>Welcome, {{ user_email }}!</h2>
+<div class="dashboard-header">
+    <div>
+        <h1>Welcome, {{ user_email }} 👋</h1>
+        <p>Analyze your resume and get a personalized career roadmap.</p>
+    </div>
+</div>
 
-<div class="card">
+<div class="card analyzer-card">
 
-```
-<h3>Resume Analyzer</h3>
+    <div class="section-title">
+        <h2>📄 Resume Analyzer</h2>
+        <p>Upload your resume or paste it below.</p>
+    </div>
 
-<form method="POST" enctype="multipart/form-data">
+    <form method="POST" enctype="multipart/form-data">
 
-    <textarea
-        name="resume"
-        placeholder="Paste your resume (Optional)"
-        rows="10"
-        cols="50"
-    ></textarea>
+        <label for="resume">Paste Resume</label>
 
-    <p>OR upload a file:</p>
+        <textarea
+            id="resume"
+            name="resume"
+            placeholder="Paste your resume here..."
+            rows="10"
+        ></textarea>
 
-    <input
-        type="file"
-        name="file"
-        accept=".pdf,.docx"
-    >
+        <div class="upload-section">
 
-    <input
-        name="role"
-        type="text"
-        placeholder="What do you want to become? (Optional)"
-    >
+            <label for="file">Or upload your resume</label>
 
-    <button type="submit">
-        Analyze Resume
-    </button>
+            <input
+                id="file"
+                type="file"
+                name="file"
+                accept=".pdf,.docx"
+            >
 
-</form>
-```
+            <small>Supported formats: PDF, DOCX</small>
+
+        </div>
+
+        <label for="role">Career Goal</label>
+
+        <input
+            id="role"
+            name="role"
+            type="text"
+            placeholder="Example: Python Developer, Data Scientist, AI Engineer"
+            required
+        >
+
+        <button type="submit" class="primary-btn">
+            ✨ Analyze Resume
+        </button>
+
+    </form>
 
 </div>
 
 {% if result %}
 
-<div class="result">
+<div class="results-container">
 
-```
-{% if result.get('error') %}
+    {% if result.get('error') %}
 
-    <p style="color: red;">
-        {{ result.get('error') }}
-    </p>
+        <div class="error-card">
+            <h3>⚠️ Something went wrong</h3>
+            <p>{{ result.get('error') }}</p>
+        </div>
 
-{% else %}
+    {% else %}
 
-    <h3>Skills Analysis</h3>
+        <div class="results-header">
+            <h2>🤖 AI Career Analysis</h2>
+            <p>Here is your personalized career analysis.</p>
+        </div>
 
-    <ul>
-        {% for skill in result.get('skills', []) %}
-            <li>{{ skill }}</li>
-        {% endfor %}
-    </ul>
+        <!-- ATS SCORE -->
 
+        <div class="result-card ats-card">
 
-    <h3>Missing Skills</h3>
+            <h3>📊 ATS Compatibility Score</h3>
 
-    <ul>
-        {% for skill in result.get('missing_skills', []) %}
-            <li>{{ skill }}</li>
-        {% endfor %}
-    </ul>
+            <div class="ats-score-display">
 
+                <div class="score-number">
+                    {{ result.get('ats_score', 0) }}
+                    <span>/100</span>
+                </div>
 
-    <h3>Roadmap</h3>
+                <div class="score-bar">
+                    <div
+                        class="score-fill"
+                        style="width: {{ result.get('ats_score', 0) }}%;"
+                    ></div>
+                </div>
 
-    <ul>
-        {% for step in result.get('roadmap', []) %}
-            <li>{{ step }}</li>
-        {% endfor %}
-    </ul>
+            </div>
 
+            {% if result.get('ats_feedback') %}
 
-    <h3>Interview Questions</h3>
+                <h4>ATS Feedback</h4>
 
-    <ul>
-        {% for question in result.get('interview_questions', []) %}
-            <li>{{ question }}</li>
-        {% endfor %}
-    </ul>
+                <ul class="ats-feedback">
+                    {% for feedback in result.get('ats_feedback', []) %}
+                        <li>{{ feedback }}</li>
+                    {% endfor %}
+                </ul>
 
-{% endif %}
-```
+            {% endif %}
+
+        </div>
+
+        <!-- SKILLS -->
+
+        <div class="result-grid">
+
+            <div class="result-card">
+
+                <h3>💡 Your Skills</h3>
+
+                <div class="skill-list">
+                    {% for skill in result.get('skills', []) %}
+                        <span class="skill-badge">
+                            {{ skill }}
+                        </span>
+                    {% endfor %}
+                </div>
+
+            </div>
+
+            <div class="result-card">
+
+                <h3>📌 Missing Skills</h3>
+
+                <div class="skill-list">
+                    {% for skill in result.get('missing_skills', []) %}
+                        <span class="missing-skill-badge">
+                            {{ skill }}
+                        </span>
+                    {% endfor %}
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ROADMAP -->
+
+        <div class="result-card full-card">
+
+            <h3>🗺️ Personalized Roadmap</h3>
+
+            <div class="roadmap-list">
+
+                {% for step in result.get('roadmap', []) %}
+
+                    <div class="roadmap-item">
+
+                        <h4>{{ step.get('skill', 'Skill') }}</h4>
+
+                        {% if step.get('learning_steps') %}
+
+                            <p><strong>Learning Steps:</strong></p>
+
+                            <ol>
+                                {% for learning_step in step.get('learning_steps', []) %}
+                                    <li>{{ learning_step }}</li>
+                                {% endfor %}
+                            </ol>
+
+                        {% endif %}
+
+                        {% if step.get('practice_project') %}
+
+                            <p>
+                                <strong>Practice Project:</strong>
+                                {{ step.get('practice_project') }}
+                            </p>
+
+                        {% endif %}
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+        <!-- INTERVIEW QUESTIONS -->
+
+        <div class="result-card full-card">
+
+            <h3>🎯 Interview Questions</h3>
+
+            <div class="interview-list">
+
+                {% for question in result.get('interview_questions', []) %}
+
+                    <div class="interview-question">
+
+                        <span class="question-number">
+                            {{ loop.index }}
+                        </span>
+
+                        <p>{{ question }}</p>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    {% endif %}
 
 </div>
 
